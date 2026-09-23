@@ -7,14 +7,22 @@ describe('calculate', () => {
     expect(result.balance).toBe(239.5)
     expect(result.invested).toBe(220)
     expect(result.interest).toBe(19.5)
-    expect(result.years).toEqual([{ year: 1, invested: 220, interest: 19.5, balance: 239.5 }])
+    expect(result.years).toEqual([{ year: 1, invested: 220, annualInterest: 19.5, interest: 19.5, balance: 239.5 }])
   })
 
   it('keeps zero-rate contributions separate from interest', () => {
     const result = calculate({ principal: 1000, monthlyDeposit: 50, annualRate: 0, years: 2 })
     expect(result.years).toHaveLength(2)
+    expect(result.years.map((year) => year.annualInterest)).toEqual([0, 0])
     expect(result.balance).toBe(2200)
     expect(result.interest).toBe(0)
+  })
+
+  it('reports each year separately while annual interest sums to cumulative interest', () => {
+    const result = calculate({ principal: 100, monthlyDeposit: 10, annualRate: 12, years: 2 })
+    expect(result.years[0].annualInterest).toBe(19.5)
+    expect(result.years[1].annualInterest).toBe(result.years[1].interest - result.years[0].interest)
+    expect(result.years.reduce((total, year) => total + year.annualInterest, 0)).toBe(result.interest)
   })
 
   it('rounds each monthly accrual to the nearest satang', () => {

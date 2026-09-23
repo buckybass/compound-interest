@@ -8,6 +8,7 @@ export type CalculatorInput = {
 export type YearResult = {
   year: number
   invested: number
+  annualInterest: number
   interest: number
   balance: number
 }
@@ -50,11 +51,14 @@ export function calculate(input: CalculatorInput): Calculation {
 
   let balanceCents = Math.round(input.principal * 100)
   let investedCents = balanceCents
+  let annualInterestCents = 0
   const depositCents = Math.round(input.monthlyDeposit * 100)
   const years: YearResult[] = []
 
   for (let month = 1; month <= input.years * 12; month++) {
-    balanceCents += Math.round(balanceCents * input.annualRate / 1200)
+    const monthlyInterestCents = Math.round(balanceCents * input.annualRate / 1200)
+    balanceCents += monthlyInterestCents
+    annualInterestCents += monthlyInterestCents
     balanceCents += depositCents
     investedCents += depositCents
     if (!Number.isSafeInteger(balanceCents)) {
@@ -64,9 +68,11 @@ export function calculate(input: CalculatorInput): Calculation {
       years.push({
         year: month / 12,
         invested: investedCents / 100,
+        annualInterest: annualInterestCents / 100,
         interest: (balanceCents - investedCents) / 100,
         balance: balanceCents / 100,
       })
+      annualInterestCents = 0
     }
   }
 

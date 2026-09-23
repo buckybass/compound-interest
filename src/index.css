@@ -1,17 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
 
 :root {
-  font-family: 'IBM Plex Sans Thai', 'DM Sans', sans-serif;
-  color: #18312d;
-  background: #f5f7f3;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'IBM Plex Sans Thai', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  background: #f4f6f5;
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; }
+body { min-width: 320px; }
 button, input { font: inherit; }
-button { cursor: pointer; }
-button:focus-visible, input:focus-visible { outline: 3px solid #d49b47; outline-offset: 3px; }
-::selection { background: #cde5d6; }
+.font-numeric { font-variant-numeric: tabular-nums; }
+input[type='number'] { appearance: textfield; }
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button { appearance: none; margin: 0; }
+
+.app-backdrop {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 700px;
+  pointer-events: none;
+  background: linear-gradient(158deg, #ecf3f0 0%, #f4f6f5 43%, #f8f4ef 100%);
+  mask-image: linear-gradient(#000 70%, transparent);
+}
+
+.glass-result {
+  background: linear-gradient(145deg, rgba(255,255,255,.94) 0%, rgba(231,246,240,.79) 48%, rgba(232,239,245,.82) 100%);
+  border: 1px solid rgba(255,255,255,.92);
+  box-shadow: 0 22px 48px rgba(40,82,74,.11), 0 3px 9px rgba(38,86,77,.04), inset 0 1px 1px rgba(255,255,255,.98);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+.glass-result::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(110deg, rgba(255,255,255,.58) 0%, transparent 39%, rgba(255,255,255,.19) 62%, transparent 100%);
+}
+
+.glass-result::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  border-top: 1px solid rgba(255,255,255,.96);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255,255,255,.85);
+  background: rgba(255,255,255,.7);
+  box-shadow: 0 8px 30px rgba(25,54,52,.045), inset 0 1px 1px rgba(255,255,255,.9);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+.chart-grid { stroke: #dfe9e3; stroke-width: 1; stroke-dasharray: 3 5; }
+.chart-caption { fill: #7e958b; font-family: -apple-system, BlinkMacSystemFont, 'IBM Plex Sans Thai', sans-serif; font-size: 11px; }
+.chart-area-total { fill: #e3f1e8; }
+.chart-area-invested { fill: #a4d6bb; }
+.chart-line { fill: none; stroke: #277f67; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.chart-end { fill: #277f67; stroke: #fff; stroke-width: 2; }
+
+@media (min-width: 1024px) {
+  .calculator-layout {
+    grid-template-areas: 'form result' 'form chart' 'form years';
+    align-items: start;
+  }
+  .layout-form { grid-area: form; }
+  .layout-result { grid-area: result; }
+  .layout-chart { grid-area: chart; margin-top: 32px; }
+  .layout-years { grid-area: years; margin-top: 32px; }
+}
+
+@media (max-width: 1023px) {
+  .layout-result { order: 0; }
+  .layout-form { order: 1; }
+  .layout-chart { order: 2; }
+  .layout-years { order: 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
