@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { CalendarDays, ChartNoAxesCombined, Coins, Percent, RotateCcw, Wallet } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { calculate, defaultInput, validateInput, type CalculatorInput, type Calculation } from './lib/calculate'
 
 const money = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 2 })
@@ -14,6 +18,7 @@ const fields = [
 ] as const
 
 function GrowthChart({ result, principal }: { result: Calculation; principal: number }) {
+  const shouldReduceMotion = useReducedMotion()
   const points = [{ year: 0, invested: principal, balance: principal }, ...result.years]
   const maximum = Math.max(result.balance, 1)
   const x = (year: number) => 10 + year / result.years.length * 620
@@ -31,7 +36,7 @@ function GrowthChart({ result, principal }: { result: Calculation; principal: nu
       ))}
       <path d={area('balance')} className="chart-area-total" />
       <path d={area('invested')} className="chart-area-invested" />
-      <path d={line('balance')} className="chart-line" />
+      <motion.path d={line('balance')} className="chart-line" initial={shouldReduceMotion ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, ease: 'easeOut' }} />
       <circle cx="630" cy={y(result.balance)} r="5" className="chart-end" />
       <text x="10" y="233" className="chart-caption">วันนี้</text>
       <text x="630" y="233" textAnchor="end" className="chart-caption">ปีที่ {result.years.length}</text>
@@ -40,6 +45,7 @@ function GrowthChart({ result, principal }: { result: Calculation; principal: nu
 }
 
 function App() {
+  const shouldReduceMotion = useReducedMotion()
   const [values, setValues] = useState<Record<Field, string>>({
     principal: String(defaultInput.principal),
     monthlyDeposit: String(defaultInput.monthlyDeposit),
@@ -83,15 +89,15 @@ function App() {
       </header>
 
       <main className="relative mx-auto max-w-6xl px-4 pb-12 pt-5 sm:px-8 lg:px-12 lg:pt-9">
-        <div className="mb-6 px-1 sm:mb-8">
+        <motion.div className="mb-6 px-1 sm:mb-8" initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#55746d]">วางแผนอย่างมั่นใจ</p>
           <h1 className="text-[36px] leading-[1.24] font-bold tracking-tight text-[#172c2d] sm:text-[44px] lg:text-[50px]">เงินเติบโต<br className="sm:hidden" />ไปได้ไกลแค่ไหน</h1>
           <p className="mt-2 text-[14px] text-[#667875] sm:text-[15px]">คำนวณดอกเบี้ยทบต้นของคุณ</p>
-        </div>
+        </motion.div>
 
         <div className="calculator-layout grid gap-8 lg:grid-cols-[minmax(310px,0.86fr)_minmax(0,1.14fr)] lg:gap-x-10 lg:gap-y-0">
-          <section className="layout-result min-w-0" aria-labelledby="result-title">
-            <div className="glass-result relative isolate overflow-hidden rounded-[28px] p-6 text-[#172b2e] sm:p-8">
+          <motion.section className="layout-result min-w-0" aria-labelledby="result-title" initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.06 }}>
+            <Card className="glass-result relative isolate overflow-hidden rounded-[28px] p-6 text-[#172b2e] sm:p-8">
               <div className="relative z-10">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#43645e]"><span className="size-2 rounded-full bg-[#429877] shadow-[0_0_0_4px_rgba(66,152,119,.12)]" /> ผลลัพธ์โดยประมาณ</span>
@@ -100,7 +106,7 @@ function App() {
                 {result ? (
                   <>
                     <h2 id="result-title" className="mt-7 text-[13px] font-medium text-[#526d68]">เงินปลายทางของคุณ</h2>
-                    <p className="mt-1 flex items-baseline gap-1.5 font-numeric text-[30px] leading-tight font-semibold tracking-tight wrap-anywhere sm:text-[40px] lg:text-[38px] xl:text-[46px]"><span className="text-[23px] font-medium text-[#327b68]">฿</span>{money.format(result.balance)}</p>
+                    <motion.p key={result.balance} initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mt-1 flex items-baseline gap-1.5 font-numeric text-[30px] leading-tight font-semibold tracking-tight wrap-anywhere sm:text-[40px] lg:text-[38px] xl:text-[46px]"><span className="text-[23px] font-medium text-[#327b68]">฿</span>{money.format(result.balance)}</motion.p>
                     <p className="mt-2 text-[12px] text-[#637c75]">จากการลงทุนต่อเนื่อง {input.years} ปี</p>
                     <div className="mt-6 grid grid-cols-2 gap-3 border-t border-white/80 pt-5 sm:gap-6">
                       <div className="min-w-0"><span className="flex items-center gap-2 text-[11px] text-[#537068]"><span className="size-2 shrink-0 rounded-full bg-[#73baa0]" />เงินที่ลงทุน</span><strong className="mt-1 block font-numeric text-[14px] font-semibold wrap-anywhere sm:text-[17px]">฿{money.format(result.invested)}</strong></div>
@@ -111,13 +117,13 @@ function App() {
                   <div className="py-10" role="status"><h2 id="result-title" className="text-xl font-semibold">ยังแสดงผลไม่ได้</h2><p className="mt-2 text-[13px] text-[#526d68]">{overflow ? 'ยอดเงินเกินช่วงที่คำนวณได้ ลองลดจำนวนเงิน อัตรา หรือระยะเวลาลง' : 'ตรวจสอบข้อมูลการลงทุนเพื่อดูผลลัพธ์'}</p></div>
                 )}
               </div>
-            </div>
-          </section>
+            </Card>
+          </motion.section>
 
-          <section className="layout-form min-w-0" aria-labelledby="input-title">
+          <motion.section className="layout-form min-w-0" aria-labelledby="input-title" initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.12 }}>
             <div className="mb-3 flex items-center justify-between px-1">
               <h2 id="input-title" className="text-[19px] font-semibold tracking-tight">ข้อมูลการลงทุน</h2>
-              <button type="button" onClick={reset} aria-label="คืนค่าเริ่มต้น" title="คืนค่าเริ่มต้น" className="flex size-11 items-center justify-center rounded-full text-[#367968] transition-colors hover:bg-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b65]"><RotateCcw size={19} aria-hidden="true" /></button>
+              <Button variant="ghost" size="icon" type="button" onClick={reset} aria-label="คืนค่าเริ่มต้น" title="คืนค่าเริ่มต้น" className="size-11 rounded-full text-[#367968] hover:bg-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b65]"><RotateCcw size={19} aria-hidden="true" /></Button>
             </div>
             <div className="overflow-hidden rounded-[26px] border border-white/80 bg-white/75 shadow-[0_8px_30px_rgba(25,54,52,.05),0_1px_2px_rgba(25,54,52,.04)] backdrop-blur-xl backdrop-saturate-180">
               {fields.map((field, index) => {
@@ -128,7 +134,7 @@ function App() {
                       <span className={`flex size-9 shrink-0 items-center justify-center rounded-[11px] ${field.tint}`} aria-hidden="true"><Icon size={19} strokeWidth={1.8} /></span>
                       <div className="min-w-0 flex-1"><label htmlFor={field.key} className="block text-[13px] font-semibold text-[#263739] sm:text-[14px]">{field.label}</label><span className="block text-[11px] text-[#81908c]">{field.hint}</span></div>
                       <div className="flex min-w-0 shrink-0 items-baseline gap-1.5">
-                        <input id={field.key} type="number" min={field.key === 'years' ? 1 : 0} max={field.max} step={field.step} inputMode={field.key === 'years' ? 'numeric' : 'decimal'} value={values[field.key]} aria-invalid={Boolean(errors[field.key])} aria-describedby={errors[field.key] ? `${field.key}-error` : undefined} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))} className={`font-numeric w-[88px] rounded-lg bg-transparent px-1 py-2 text-right text-[17px] font-semibold text-[#172b2e] outline-none placeholder:text-[#899994] focus-visible:bg-[#e9f4ef] focus-visible:outline-2 focus-visible:outline-[#398b74] sm:w-[120px] sm:text-[19px] ${errors[field.key] ? 'text-[#b44c40] outline-2 outline-[#b44c40]' : ''}`} />
+                        <Input id={field.key} type="number" min={field.key === 'years' ? 1 : 0} max={field.max} step={field.step} inputMode={field.key === 'years' ? 'numeric' : 'decimal'} value={values[field.key]} aria-invalid={Boolean(errors[field.key])} aria-describedby={errors[field.key] ? `${field.key}-error` : undefined} onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))} className={`font-numeric h-auto w-[88px] rounded-lg border-0 bg-transparent px-1 py-2 text-right text-[17px] font-semibold text-[#172b2e] shadow-none outline-none placeholder:text-[#899994] focus-visible:bg-[#e9f4ef] focus-visible:ring-0 sm:w-[120px] sm:text-[19px] ${errors[field.key] ? 'text-[#b44c40] outline-2 outline-[#b44c40]' : ''}`} />
                         <span className="w-6 text-right text-[11px] font-medium text-[#71837c]">{field.unit}</span>
                       </div>
                     </div>
@@ -139,19 +145,19 @@ function App() {
               })}
             </div>
             <p className="mt-3 px-2 text-[12px] leading-relaxed text-[#748580]">ดอกเบี้ยคิดรายเดือน และฝากเพิ่มในวันสิ้นเดือน</p>
-          </section>
+          </motion.section>
 
           {result && (
             <>
-              <section className="layout-chart min-w-0" aria-labelledby="chart-title">
+              <motion.section className="layout-chart min-w-0" aria-labelledby="chart-title" initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.18 }}>
                 <div className="mb-3 flex items-end justify-between px-1"><div><p className="text-[11px] font-semibold uppercase tracking-wider text-[#718881]">ภาพรวม</p><h2 id="chart-title" className="mt-1 text-[19px] font-semibold tracking-tight">เส้นทางการเติบโต</h2></div><span className="text-[12px] text-[#718881]">{input.years} ปี</span></div>
                 <div className="glass-panel rounded-[26px] p-4 sm:p-6">
                   <div className="flex gap-5 px-1 text-[11px] text-[#536e67]"><span className="flex items-center gap-2"><i className="size-2 rounded-full bg-[#76bea2]" />เงินลงทุน</span><span className="flex items-center gap-2"><i className="size-2 rounded-full bg-[#277f67]" />ยอดรวม</span></div>
                   <div className="mt-4"><GrowthChart result={result} principal={input.principal} /></div>
                 </div>
-              </section>
+              </motion.section>
 
-              <section className="layout-years min-w-0" aria-labelledby="years-title">
+              <motion.section className="layout-years min-w-0" aria-labelledby="years-title" initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.24 }}>
                 <div className="mb-3 flex items-end justify-between px-1"><div><p className="text-[11px] font-semibold uppercase tracking-wider text-[#718881]">รายละเอียด</p><h2 id="years-title" className="mt-1 text-[19px] font-semibold tracking-tight">สรุปรายปี</h2></div><span className="text-[12px] text-[#718881]">{result.years.length} ปี</span></div>
                 <div className="glass-panel max-h-[440px] overflow-y-auto rounded-[26px] scrollbar-thin">
                   <div className="sm:hidden">
@@ -162,7 +168,7 @@ function App() {
                     <tbody>{result.years.map((year) => <tr key={year.year} className="border-t border-[#e6ece9]"><th scope="row" className="px-5 py-3 text-left font-semibold text-[#4c7d6f]">{String(year.year).padStart(2, '0')}</th><td className="px-3 py-3">฿{money.format(year.invested)}</td><td className="px-3 py-3 text-[#b76e48]">฿{money.format(year.annualInterest)}</td><td className="px-3 py-3">฿{money.format(year.interest)}</td><td className="px-5 py-3 font-semibold text-[#1c3d39]">฿{money.format(year.balance)}</td></tr>)}</tbody>
                   </table>
                 </div>
-              </section>
+              </motion.section>
             </>
           )}
         </div>
